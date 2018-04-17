@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>history</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    body {
+      background-color: #F7F7F7;
+      font-family: Arial;
+    }
+
+    header {
+      background: #242424;
+      border-bottom: 1px solid #000;
+    }
+
+    .wrapper {
+      width: 1100px;
+      height: 70px;
+      margin: 0 auto;
+    }
+
+    header .wrapper h1 {
+      float: left;
+      width: 176px;
+      height: 69px;
+      background: url(image/topbar.png) no-repeat 0 0;
+      font-size: 0;
+    }
+
+    header .wrapper ul {
+      list-style: none;
+    }
+
+    header .wrapper ul li {
+      float: left;
+      height: 70px;
+    }
+
+    header .wrapper ul li.now,
+    header .wrapper ul li:hover {
+      background: #12b7f5;
+    }
+
+    header .wrapper ul li a {
+      padding: 0 20px;
+      display: block;
+      color: #fff;
+      line-height: 70px;
+      text-decoration: none;
+    }
+
+    .content {
+      width: 1100px;
+      margin: 0 auto;
+      font-size: 100px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <!-- 在html写php还能生效吗？
+      因为在index.php 中有一句话: include 'template.html'
+
+    
+    -->
+    <div class="wrapper">
+      <h1>网易云音乐</h1>
+      <ul>
+        <li data-page="index" class="<?php echo $page=='index'?'now':''  ?>">
+          <a href="index.php">发现音乐</a>
+        </li>
+        <li data-page="my"  class="<?php echo $page=='my'?'now':''  ?>">
+          <a href="my.php">我的音乐</a>
+        </li>
+        <li data-page="friend"  class="<?php echo $page=='friend'?'now':''  ?>">
+          <a href="friend.php">朋友</a>
+        </li>
+      </ul>
+    </div>
+  </header>
+  <div class="content">
+
+  </div>
+  <script src="js/jquery.min.js"></script>
+
+
+
+  <script>
+      $(function() {
+        // 通过事件委托给a标签绑定事件
+        $('.wrapper').on('click','a',function(){
+
+            // 获取a标签的父元素li的自定义属性
+            var page = $(this).parent().attr('data-page');
+            // 将自定义属性传到后台 获取 内容 渲染页面
+            render(page);
+            // 获取当前a标签的url
+            var historyUrl = $(this).attr('href');
+
+            // 把当前的url添加到历史记录中去 pushState(null,null,url)
+
+            history.pushState(null,null,historyUrl);
+
+            // 禁止跳转
+            return false;
+        })
+
+      })
+
+        var render = function(page){
+          $.ajax({
+            type:'get',
+            url:'./php/data.php',
+            data: {
+              page:page || 'index'
+            },
+            dataType:'json',
+            success:function(msg){
+              // console.log(msg);
+              // 删除所有的now 即高亮显示
+
+              $('[data-page]').removeClass('now');
+
+              // 给当前的添加now
+              $('[data-page='+msg.page+']').addClass('now');
+              // 将内容放到content里面
+              $('.content').html(msg.html);
+            }
+
+          })
+        }
+
+  </script>
+
+
+</body>
+
+</html>
